@@ -1,0 +1,34 @@
+<?xml version='1.0' standalone='yes'?>
+
+<tables>
+	<!-- Write down the fields in the order of the OLD database. -->
+	<!-- <OLD_FIELD>new_field</OLD_FIELD> -->
+
+	<pre_convertion_queries>
+		<query on="new">TRUNCATE users_media</query>
+		<query on="old">ALTER TABLE `player_basketball_stats` CHANGE `3pt` `score_3pt` FLOAT(4,1) UNSIGNED NOT NULL DEFAULT '0.0';</query>
+	</pre_convertion_queries>
+
+	<!-- Main Users Table -->
+	<table name="users" to="users" skip="false" truncate="true" onStart="" onComplete="complete_users">
+		<id>id</id>
+		<created>created_at</created>
+		<last_login>last_login_at</last_login>
+		<last_modified>updated_at</last_modified>
+		<email function="strtolower">email</email>
+		<password>password</password>
+		<name_first>first_name</name_first>
+		<name_last>last_name</name_last>
+		<picture>picture</picture>
+		<status>status</status>
+		<message_notify>message_notify</message_notify>
+		<type function="general_convert(user_types,value)">user_type</type>
+
+		<!-- This inserts a record to a different table using additional data from the `data` attribute and then skips this field in the `users` table -->
+		<old_field table="table_to_insert" data="user_id={user_id},media_type='media'" type="insert" skip="true">new_field</old_field>
+
+		<!-- Same thing as insert only it executes an update query, helps us when we have data from other tables that we need to update in other places -->
+		<old_field2 table="table_to_update" where="user_id={user_id} AND my_condition='value'" type="update" skip="true">new_field</old_field2>
+	</table>
+
+</tables>
